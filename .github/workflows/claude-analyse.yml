@@ -1,0 +1,50 @@
+name: Claude Analyse Workflow
+
+on:
+  issues:
+    types: [labeled]
+  issue_comment:
+    types: [created]
+
+jobs:
+  triage:
+    if: |
+      (github.event_name == 'issues' && github.event.label.name == 'triage_with_claude') ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/triage'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Analyse and Triage Issue
+        id: claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          trigger_phrase: "/triage"
+          direct_prompt: |
+            You are an issue triage assistant for this repository.
+
+            Analyse the following GitHub issue and determine whether the description is clear enough to act on.
+
+            A clear issue description must have:
+            1. A concise summary of the problem or feature request
+            2. Steps to reproduce (for bugs) or a clear rationale (for features)
+            3. Expected vs actual behaviour (for bugs)
+
+            If the issue description IS clear:
+            - Add the label "triaged"
+            - Add a comment summarising the issue in one sentence and suggesting which area of the codebase is likely affected
+
+            If the issue description IS NOT clear:
+            - Add the label "needs-more-info"
+            - Add a polite comment explaining exactly what information is missing and asking the author to update the issue before work can begin
+            - Do NOT proceed with any further analysis
+          claude_args: |
+            --allowedTools "mcp__github__issue_write,mcp__github__create_pull_request,mcp__github__update_pull_request"
