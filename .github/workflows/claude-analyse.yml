@@ -28,7 +28,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           trigger_phrase: "/triage"
-          direct_prompt: |
+          prompt: |
             You are an issue triage assistant for this repository.
 
             Analyse the following GitHub issue and determine whether the description is clear enough to act on.
@@ -47,4 +47,4 @@ jobs:
             - Add a polite comment explaining exactly what information is missing and asking the author to update the issue before work can begin
             - Do NOT proceed with any further analysis
           claude_args: |
-            --allowedTools "mcp__github__issue_write,mcp__github__create_pull_request,mcp__github__update_pull_request"
+            --allowedTools "mcp__github__issue_write,mcp__github__create_pull_request,mcp__github__update_pull_request,mcp__github__issue_read,mcp__github__update_issue,mcp__github__**"

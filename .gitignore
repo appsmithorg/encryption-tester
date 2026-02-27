@@ -1,0 +1,13 @@
+# Build output
+target/
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# Claude local settings
+.claude/**/settings.local.json
+
+# Cursor local settings
+.cursor/**/settings.local.json
